@@ -1,0 +1,36 @@
+{
+  "notes": [
+    "A 9B model cannot be truly retrained into a 70B model. For a true 70B/72B-class system, start from a real 70B/72B base model and QLoRA/LoRA fine-tune it.",
+    "For coding quality, a strong 32B coder model can beat a generic 70B on many programming tasks. Benchmark both before committing weeks of training."
+  ],
+  "models": [
+    {
+      "id": "qwen2_5_coder_32b",
+      "repo": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "class": "32B coding specialist",
+      "recommended": true,
+      "why": "Strong coding base; cheaper and likely higher coding ROI than generic 70B."
+    },
+    {
+      "id": "qwen2_5_72b",
+      "repo": "Qwen/Qwen2.5-72B-Instruct",
+      "class": "72B general instruct",
+      "recommended": true,
+      "why": "True 70B-class open model; use if you insist on 70B scale."
+    },
+    {
+      "id": "llama_3_3_70b",
+      "repo": "meta-llama/Llama-3.3-70B-Instruct",
+      "class": "70B general instruct",
+      "recommended": false,
+      "why": "Strong general model but gated; coding may trail coder-specialized bases."
+    },
+    {
+      "id": "local_qwythos_13b_upscaled",
+      "repo": "local:training/mlx_scratch/qwythos-13b-mlx-q4",
+      "class": "upscaled 9B experiment",
+      "recommended": false,
+      "why": "Useful experiment, but not a true 13B/70B base. Keep as experimental branch."
+    }
+  ]
+}

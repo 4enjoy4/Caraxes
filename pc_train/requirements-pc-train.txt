@@ -1,0 +1,14 @@
+accelerate
+bitsandbytes
+datasets
+einops
+huggingface-hub
+peft
+protobuf
+sentencepiece
+torch
+transformers
+trl
+wandb
+# Recommended for serious 70B/72B QLoRA runs on Linux/WSL2:
+axolotl
