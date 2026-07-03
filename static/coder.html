@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caraxes Coder</title>
+    <link rel="stylesheet" href="/static/coder.css?v=20260703-r13" />
+  </head>
+  <body>
+    <div id="coderShell" class="coder-shell">
+      <header class="titlebar">
+        <a class="home-link" href="/" title="Back to home">
+          <span class="brand-mark">C</span>
+          <span class="brand-name">Caraxes <em>Coder</em></span>
+        </a>
+        <button id="workspaceBtn" class="workspace-btn" type="button" title="Open a different folder">
+          <span id="workspaceName">No folder open</span>
+          <span class="caret-down">&#9662;</span>
+        </button>
+        <div class="titlebar-actions">
+          <span id="userLabel" class="user-label"></span>
+          <a class="titlebar-link" href="/chat">Chat</a>
+          <a class="titlebar-link" href="/activity" title="Who did what">Activity</a>
+          <a class="titlebar-link" href="/login" title="Sign in or create another local account">Switch</a>
+          <button id="toggleAiBtn" class="titlebar-link as-button" type="button">AI panel</button>
+          <button id="logoutBtn" class="titlebar-link as-button" type="button" title="Log out">Log out</button>
+          <div class="status-pill" title="Local model status">
+            <span id="statusPulse" class="pulse"></span>
+            <span id="statusLabel">Checking...</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="workbench" id="workbench">
+        <aside class="explorer" id="explorerPane">
+          <div class="pane-head">
+            <span class="pane-title">Explorer</span>
+            <div class="pane-actions">
+              <button id="newFileBtn" type="button" title="New file">
+                <svg viewBox="0 0 16 16"><path d="M9.5 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5L9.5 1zM9 5V2.2L11.8 5H9z"/><path d="M7.5 8v1.5H6v1h1.5V12h1v-1.5H10v-1H8.5V8h-1z"/></svg>
+              </button>
+              <button id="newFolderBtn" type="button" title="New folder">
+                <svg viewBox="0 0 16 16"><path d="M14 4H8L6.5 2.5H2a1 1 0 0 0-1 1V12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zM8.5 7.5V6h-1v1.5H6v1h1.5V10h1V8.5H10v-1H8.5z"/></svg>
+              </button>
+              <button id="openLocalFolderBtn" type="button" title="Open a folder on this device">
+                <svg viewBox="0 0 16 16"><path d="M14 4H8L6.5 2.5H2a1 1 0 0 0-1 1V12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/><path d="M8 6l2.5 2.5H9v3H7v-3H5.5L8 6z"/></svg>
+              </button>
+              <button id="shareLocalFolderBtn" type="button" title="Share this local folder to the Caraxes server">
+                <svg viewBox="0 0 16 16"><path d="M8 2l5 3v6l-5 3-5-3V5l5-3zm0 1.8L4.8 5.7 8 7.6l3.2-1.9L8 3.8zM4.5 7.1v3l2.8 1.7v-3L4.5 7.1zm7 0L8.7 8.8v3l2.8-1.7v-3z"/></svg>
+              </button>
+              <button id="uploadFilesBtn" type="button" title="Upload files into this workspace">
+                <svg viewBox="0 0 16 16"><path d="M8 1l4 4h-2.5v4h-3V5H4l4-4z"/><path d="M2 11h12v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3zm2 1.5v1h2v-1H4z"/></svg>
+              </button>
+              <button id="uploadFolderBtn" type="button" title="Upload a whole folder (keeps its structure)">
+                <svg viewBox="0 0 16 16"><path d="M14 4H8L6.5 2.5H2a1 1 0 0 0-1 1V12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zM8 5.5l2.5 2.5H9v2.5H7V8H5.5L8 5.5z"/></svg>
+              </button>
+              <button id="downloadWorkspaceBtn" type="button" title="Download this workspace as a zip">
+                <svg viewBox="0 0 16 16"><path d="M7 2h2v6h2.5L8 11.5 4.5 8H7V2z"/><path d="M2 12h12v2H2v-2z"/></svg>
+              </button>
+              <button id="refreshBtn" type="button" title="Refresh tree">
+                <svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9L13.5 2v4h-4l1.6-1.6A4 4 0 1 0 12 8h1.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="localWorkspaceActions" class="local-workspace-actions">
+            <button id="localActionOpenBtn" type="button">Open local folder</button>
+            <button id="localActionShareBtn" type="button">Share to server</button>
+          </div>
+          <div id="tree" class="tree" tabindex="0"></div>
+          <input id="uploadFilesInput" type="file" multiple hidden />
+          <input id="uploadFolderInput" type="file" webkitdirectory hidden />
+          <div id="explorerResizer" class="v-resizer" role="separator" aria-orientation="vertical"></div>
+        </aside>
+
+        <main class="editor-area">
+          <div id="tabs" class="tabs"></div>
+          <div class="editor-host">
+            <div id="monacoHost" class="monaco-host"></div>
+            <div id="previewHost" class="preview-host"></div>
+            <div id="welcome" class="welcome">
+              <div class="welcome-card">
+                <p class="eyebrow">Caraxes Coder</p>
+                <h3 id="welcomeTitle">Open a folder to start</h3>
+                <ul class="welcome-tips">
+                  <li><span>Click a file</span> in the explorer to edit it with syntax coloring</li>
+                  <li><kbd>Ctrl</kbd>+<kbd>S</kbd> saves the active file to disk</li>
+                  <li><span>Right-click</span> the explorer for new file, rename, delete</li>
+                  <li><span>Select code</span> and ask the AI panel about it, or ask it to create and rewrite files</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="ai-panel" id="aiPanel">
+          <div id="aiResizer" class="v-resizer left" role="separator" aria-orientation="vertical"></div>
+          <div class="pane-head">
+            <span class="pane-title">Caraxes AI</span>
+            <div class="ai-mode" role="group" aria-label="AI mode">
+              <button id="modeAskBtn" class="mode-btn active" type="button" title="Ask questions about your code">Ask</button>
+              <button id="modeEditBtn" class="mode-btn" type="button" title="Create files or rewrite existing files">Edit</button>
+              <button id="modeAutoBtn" class="mode-btn" type="button" title="Edits files and runs commands automatically">Auto</button>
+            </div>
+          </div>
+          <div id="aiMessages" class="ai-messages">
+            <div class="ai-empty">
+              <p>Ask about the open file, paste an error, or switch to <strong>Edit file</strong> and ask me to create or rewrite files. In Edit file mode, file cards are saved to the workspace automatically.</p>
+            </div>
+          </div>
+          <div class="ai-composer-wrap">
+            <div id="aiContext" class="ai-context"></div>
+            <form id="aiComposer" class="ai-composer">
+              <textarea id="aiInput" rows="1" placeholder="Ask Caraxes about your code..."></textarea>
+              <button id="aiSendBtn" type="submit">Send</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="statusbar">
+        <span id="sbWorkspace" class="sb-item" title="Workspace root"></span>
+        <span id="sbFile" class="sb-item"></span>
+        <span id="sbLastEdit" class="sb-item" title="Last change to this file from the activity log"></span>
+        <span class="sb-spacer"></span>
+        <span id="sbProblems" class="sb-item"></span>
+        <span id="sbDirty" class="sb-item"></span>
+        <span id="sbPosition" class="sb-item"></span>
+        <span id="sbLanguage" class="sb-item"></span>
+        <span class="sb-item">UTF-8</span>
+      </footer>
+    </div>
+
+    <div id="openOverlay" class="open-overlay hidden">
+      <div class="open-card">
+        <div class="open-head">
+          <img src="/static/assets/caraxes-dragon-v2.png" alt="" />
+          <div>
+            <h3>Open a folder</h3>
+            <p>Caraxes Coder edits real files on this PC. Everything stays local.</p>
+          </div>
+        </div>
+        <form id="openForm" class="open-form">
+          <input id="openPathInput" type="text" spellcheck="false" placeholder="C:\Users\you\my-project" />
+          <button type="submit">Open</button>
+        </form>
+        <p id="openError" class="open-error"></p>
+        <div class="open-lists">
+          <div>
+            <p class="open-label">Quick access</p>
+            <div id="openSuggestions" class="open-buttons"></div>
+          </div>
+          <div>
+            <p class="open-label">Recent folders</p>
+            <div id="openRecents" class="open-buttons"></div>
+          </div>
+        </div>
+        <div id="shareSection" class="share-section"></div>
+        <button id="openCancelBtn" class="open-cancel" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <div id="ctxMenu" class="ctx-menu hidden"></div>
+
+    <script src="/static/vendor/monaco/vs/loader.js"></script>
+    <script src="/static/coder.js?v=20260703-r13"></script>
+  </body>
+</html>

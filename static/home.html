@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caraxes - Local AI forge</title>
+    <link rel="stylesheet" href="/static/home.css" />
+  </head>
+  <body>
+    <div class="hero">
+      <header class="hero-top">
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <div>
+            <h1>Caraxes</h1>
+            <p>Local AI forge</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a id="accountPill" class="account-pill" href="/login" title="Signed-in account">
+            <span id="accountGreeting">Checking session</span>
+            <strong id="accountName">...</strong>
+          </a>
+          <div id="statusPill" class="status-pill">
+            <span class="pulse"></span>
+            <span id="statusLabel">Checking model...</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="hero-body">
+        <div class="hero-copy">
+          <p class="eyebrow">Private - runs on this machine</p>
+          <h2>Wake the dragon.<br />Pick your forge.</h2>
+          <p class="lede">
+            One local model, two workbenches. Chat with your files and screenshots,
+            or open a folder and code with Caraxes at your side.
+          </p>
+
+          <div class="mode-cards">
+            <a class="mode-card" href="/chat">
+              <div class="mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/>
+                  <path d="M8 9h8M8 12.5h5"/>
+                </svg>
+              </div>
+              <div class="mode-copy">
+                <h3>Chat</h3>
+                <p>Ask, inspect, revise. Drop in code, PDFs, spreadsheets, or screenshots and keep the history.</p>
+              </div>
+              <span class="mode-go" aria-hidden="true">&rarr;</span>
+            </a>
+
+            <a class="mode-card" href="/coder">
+              <div class="mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m8 8-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/>
+                </svg>
+              </div>
+              <div class="mode-copy">
+                <h3>Coder</h3>
+                <p>A VS Code-style editor in your browser. Open any folder, edit with syntax coloring, preview images and PDFs, and let the model change files with you.</p>
+              </div>
+              <span class="mode-go" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <img src="/static/assets/caraxes-dragon.png" alt="" />
+        </div>
+      </main>
+
+      <footer class="hero-foot">
+        <span>Everything stays on your PC - local accounts, no cloud.</span>
+        <span id="modelName"></span>
+      </footer>
+    </div>
+
+    <script>
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      async function loadAccount() {
+        const pill = document.querySelector("#accountPill");
+        const greeting = document.querySelector("#accountGreeting");
+        const name = document.querySelector("#accountName");
+        try {
+          const response = await fetch("/api/auth/me");
+          if (!response.ok) throw new Error("Not signed in");
+          const data = await response.json();
+          const label = data.user.display_name || data.user.username;
+          greeting.textContent = "Welcome";
+          name.textContent = label;
+          pill.href = "/activity";
+          pill.title = `Signed in as ${escapeHtml(data.user.username)}`;
+          pill.classList.add("signed-in");
+        } catch (error) {
+          greeting.textContent = "Not signed in";
+          name.textContent = "Sign in";
+          pill.href = "/login";
+          pill.title = "Sign in or create a local account";
+          pill.classList.remove("signed-in");
+        }
+      }
+
+      async function loadStatus() {
+        const pill = document.querySelector("#statusPill");
+        const label = document.querySelector("#statusLabel");
+        const pulse = pill.querySelector(".pulse");
+        try {
+          const response = await fetch("/api/status");
+          if (!response.ok) throw new Error(response.statusText);
+          const data = await response.json();
+          const model = data.model;
+          document.querySelector("#modelName").textContent = model.filename || "";
+          if (model.openai_base_url) {
+            label.textContent = "Model backend online";
+            pulse.classList.add("ready");
+          } else if (!model.model_exists) {
+            label.textContent = "Model missing - run scripts\\download_model.ps1";
+            pulse.classList.add("error");
+          } else if (!model.llama_cpp_installed) {
+            label.textContent = "Runtime missing - install requirements-llm.txt";
+            pulse.classList.add("error");
+          } else {
+            label.textContent = model.loaded ? "Model loaded" : "Model ready";
+            pulse.classList.add("ready");
+          }
+        } catch (error) {
+          label.textContent = "Server unavailable";
+          pulse.classList.add("error");
+        }
+      }
+      loadAccount();
+      loadStatus();
+      setInterval(loadStatus, 10000);
+    </script>
+  </body>
+</html>

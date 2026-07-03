@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caraxes Local AI</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260703-r5" />
+  </head>
+  <body>
+    <div id="appShell" class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Collapse sidebar" title="Collapse sidebar"><<</button>
+          <div class="brand-copy">
+            <h1>Caraxes</h1>
+            <p>Local AI forge</p>
+          </div>
+        </div>
+        <nav class="page-nav" aria-label="Pages">
+          <a href="/" title="Home">&#8962; <span class="page-nav-label">Home</span></a>
+          <a href="/coder" title="Caraxes Coder">&lt;/&gt; <span class="page-nav-label">Coder</span></a>
+        </nav>
+        <div id="userRow" class="user-row"></div>
+        <button id="newChatBtn" class="primary-action" type="button"><span class="new-chat-label">New chat</span><span class="new-chat-plus">+</span></button>
+        <div id="statusCard" class="status-card">
+          <span class="pulse"></span>
+          <div class="status-copy">
+            <strong id="statusTitle">Checking model</strong>
+            <small id="statusText">Preparing the lair...</small>
+          </div>
+        </div>
+        <nav id="chatList" class="chat-list" aria-label="Chat history"></nav>
+        <div id="sidebarResizer" class="sidebar-resizer" role="separator" aria-orientation="vertical" title="Resize sidebar"></div>
+      </aside>
+
+      <main class="chat-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Private LAN chat server</p>
+            <h2 id="chatTitle">New chat</h2>
+          </div>
+          <div class="topbar-actions">
+            <label class="control mode-control">
+              <span>Mode</span>
+              <select id="taskMode">
+                <option value="auto" selected>Auto</option>
+                <option value="coding">Coding</option>
+                <option value="code_review">Code review</option>
+                <option value="secure_code">Secure code</option>
+                <option value="blue_team">Blue team</option>
+                <option value="incident_response">Incident</option>
+                <option value="purple_team">Purple team</option>
+                <option value="detection_engineering">Detection</option>
+                <option value="red_team_aware_defense">Red defense</option>
+                <option value="large_file">Large file</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Temp</span>
+              <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7" />
+            </label>
+            <label class="control">
+              <span>Tokens</span>
+              <input id="maxTokens" type="number" min="64" max="4096" step="64" value="900" />
+            </label>
+          </div>
+        </header>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <div class="empty-state">
+            <img src="/static/assets/caraxes-dragon-v2.png" alt="" />
+            <div>
+              <p class="eyebrow">Ask, inspect, revise</p>
+              <h3>Drop code, PDFs, spreadsheets, or screenshots into the chat.</h3>
+              <p>Caraxes keeps your history here and runs from this machine once the GGUF is installed.</p>
+            </div>
+          </div>
+        </section>
+        <button id="scrollBottomBtn" class="scroll-bottom" type="button">Bottom</button>
+
+        <section class="composer-wrap">
+          <div id="attachmentTray" class="attachment-tray"></div>
+          <form id="composer" class="composer">
+            <label class="file-button" title="Attach files">
+              <input id="fileInput" type="file" multiple />
+              <span>Attach</span>
+            </label>
+            <textarea id="messageInput" rows="1" placeholder="Message Caraxes..."></textarea>
+            <button id="sendBtn" type="submit">Send</button>
+          </form>
+        </section>
+      </main>
+    </div>
+    <script src="/static/app.js?v=20260703-r5"></script>
+  </body>
+</html>

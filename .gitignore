@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+data/*
+!data/.gitkeep
+uploads/*
+!uploads/.gitkeep
+models/**/*
+!models/.gitkeep
+logs/
+outputs/
+workspaces/
+training/data/*
+!training/data/.gitkeep
+training/mlx_lora_data/
+*.log
+.env
