@@ -21,6 +21,7 @@ Because the starting 9B model is abliterated, the first training stage should ma
 - `scripts/refresh_hf_metadata.py` - refreshes Hugging Face download/like metadata.
 - `scripts/build_sft_dataset.py` - converts selected datasets into chat-style JSONL.
 - `scripts/make_axolotl_config.py` - writes an Axolotl QLoRA config.
+- `scripts/self_correct_collect.py` - generates self-correction coding traces by running model code in Docker.
 - `panel.py` - terminal panel to select datasets/model and run the scripts.
 - `data/`, `cache/`, `outputs/`, `adapters/` - generated locally and ignored by git.
 
@@ -68,7 +69,11 @@ Add `opencodeinstruct`, `opencodereasoning`, `magicoder_oss`, and `magicoder_evo
 
 Use longer sequence lengths only after the normal run is stable. Move from `8192` to `16384`, then `32768` if memory and speed are acceptable. This helps with large documentation and logs, but the real solution for 500-page PDFs or 2M-line logs is still chunking plus retrieval in the app, not stuffing everything into model weights.
 
-5. Optional cyber/purple-team pass.
+5. Self-correction coding pass.
+
+Use `pc_train/scripts/self_correct_collect.py` to make your own execution-verified examples: prompt the model, run its code in Docker, feed errors back, and save the successful repair path into `pc_train/data/self_correction_sft.jsonl`. Mix this data into later SFT runs after you have a few hundred clean traces. See `pc_train/README_SELF_CORRECTION.md`.
+
+6. Optional cyber/purple-team pass.
 
 Use `trendyol_cybersecurity`, `cybernative_code_security_dpo`, or other cyber datasets only after manual inspection. Keep it defensive, authorized, and lab-scoped. The goal is red-team literacy for blue/purple work, not a model that blindly produces operational abuse.
 
@@ -97,6 +102,7 @@ python pc_train/scripts/make_axolotl_config.py \
   --model qwen2_5_coder_32b \
   --sequence-len 8192 \
   --dataset pc_train/data/merged_code_sft.jsonl \
+  --extra-dataset pc_train/data/self_correction_sft.jsonl \
   --out pc_train/configs/axolotl_qlora.yaml
 ```
 
@@ -104,6 +110,19 @@ Train:
 
 ```bash
 accelerate launch -m axolotl.cli.train pc_train/configs/axolotl_qlora.yaml
+```
+
+Build self-correction data:
+
+```bash
+docker build -t caraxes-code-sandbox:latest pc_train/self_correction
+python pc_train/scripts/self_correct_collect.py \
+  --language python \
+  --prompt-file pc_train/self_correction/examples/two_sum_prompt.txt \
+  --tests-file pc_train/self_correction/examples/test_two_sum.py \
+  --api-base http://127.0.0.1:9901/v1 \
+  --model local-model \
+  --max-rounds 5
 ```
 
 ## Dataset Policy

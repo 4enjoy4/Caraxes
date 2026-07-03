@@ -1,0 +1,4 @@
+Write a Python function named two_sum(nums, target).
+
+It should return the indices of the two numbers that add up to target.
+Return the indices as a tuple. You may assume exactly one valid answer exists.

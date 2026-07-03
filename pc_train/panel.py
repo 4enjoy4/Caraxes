@@ -90,6 +90,7 @@ def main() -> None:
         print("3. Build merged SFT JSONL")
         print("4. Generate Axolotl QLoRA config")
         print("5. Show recommended training commands")
+        print("6. Run self-correction data collector")
         print("q. Quit")
         choice = input("> ").strip().lower()
         if choice == "q":
@@ -117,7 +118,7 @@ def main() -> None:
         elif choice == "4":
             model = choose_model()
             seq = input("Sequence length [8192, try 16384 later]: ").strip() or "8192"
-            run([
+            cmd = [
                 sys.executable,
                 str(ROOT / "scripts" / "make_axolotl_config.py"),
                 "--model",
@@ -128,7 +129,11 @@ def main() -> None:
                 str(ROOT / "data" / "merged_code_sft.jsonl"),
                 "--out",
                 str(ROOT / "configs" / "axolotl_qlora.yaml"),
-            ])
+            ]
+            extras = input("Extra JSONL datasets, comma-separated [optional]: ").strip()
+            for extra in [item.strip() for item in extras.split(",") if item.strip()]:
+                cmd.extend(["--extra-dataset", extra])
+            run(cmd)
         elif choice == "5":
             print("\nInstall:")
             print("  python -m venv .venv-train")
@@ -145,6 +150,35 @@ def main() -> None:
             print("  3) optional DPO/ORPO pass with secure-code preference data")
             print("\nMonitor:")
             print("  tensorboard --logdir pc_train/outputs")
+        elif choice == "6":
+            language = input("Language [python]: ").strip() or "python"
+            prompt_file = input("Prompt file path: ").strip()
+            tests_file = input("Visible tests file path [optional]: ").strip()
+            hidden_tests_file = input("Hidden tests file path [optional]: ").strip()
+            model = input("Model name [local-model]: ").strip() or "local-model"
+            api_base = input("OpenAI-compatible API base [http://127.0.0.1:9901/v1]: ").strip() or "http://127.0.0.1:9901/v1"
+            rounds = input("Max repair rounds [5]: ").strip() or "5"
+            cmd = [
+                sys.executable,
+                str(ROOT / "scripts" / "self_correct_collect.py"),
+                "--language",
+                language,
+                "--prompt-file",
+                prompt_file,
+                "--api-base",
+                api_base,
+                "--model",
+                model,
+                "--max-rounds",
+                rounds,
+            ]
+            if tests_file:
+                cmd.extend(["--tests-file", tests_file])
+            if hidden_tests_file:
+                cmd.extend(["--hidden-tests-file", hidden_tests_file])
+            if input("Build/update Docker sandbox image first? [y/N]: ").strip().lower() == "y":
+                cmd.append("--build-image")
+            run(cmd)
 
 
 if __name__ == "__main__":
